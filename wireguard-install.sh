@@ -196,6 +196,10 @@ PrivateKey = $SERVER_PRIV_KEY" > "/etc/wireguard/$SERVER_WG_NIC.conf"
 #PostDown = iptables -D FORWARD -i $SERVER_WG_NIC -j ACCEPT; iptables -t nat -D POSTROUTING -o $SERVER_PUB_NIC -j MASQUERADE; ip6tables -D FORWARD -i $SERVER_WG_NIC -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $SERVER_PUB_NIC -j MASQUERADE" >> "/etc/wireguard/$SERVER_WG_NIC.conf"
 #fi
 
+# iptables ipv4 only
+echo "PostUp = iptables -I FORWARD -i $SERVER_WG_NIC -j ACCEPT; iptables -I FORWARD -o $SERVER_WG_NIC -j ACCEPT; iptables -t nat -A POSTROUTING -o $SERVER_PUB_NIC -j MASQUERADE; iptables -I INPUT -p udp --dport $SERVER_PORT -j ACCEPT
+PostDown = iptables -D FORWARD -i $SERVER_WG_NIC -j ACCEPT; iptables -D FORWARD -o $SERVER_WG_NIC -j ACCEPT; iptables -t nat -D POSTROUTING -o $SERVER_PUB_NIC -j MASQUERADE; iptables -D INPUT -p udp --dport $SERVER_PORT -j ACCEPT" >> "/etc/wireguard/$SERVER_WG_NIC.conf"
+
 # Enable routing on the server
 echo "net.ipv4.ip_forward = 1
 net.ipv6.conf.all.forwarding = 1" > /etc/sysctl.d/wg.conf
